@@ -1,24 +1,30 @@
 extends Control
 # Level Select Screen - For browsing and selecting game levels
 
-var levels_container: GridContainer
+@onready var levels_container = $ScrollContainer/LevelsGrid
+@onready var back_button = $ButtonsContainer/BackButton
+
 var animation_player: AnimationPlayer
-var tween: Tween
-var level_button_scene = preload("res://scenes/ui/level_button.tscn")
+var tween: Tween = null
+var level_button_scene = preload("res://scenes/ui/simple_level_button.tscn") if FileAccess.file_exists("res://scenes/ui/simple_level_button.tscn") else null
 var level_buttons = []
 
 # Called when the node enters the scene tree for the first time
 func _ready():
 	# Get references to nodes
-	levels_container = $ScrollContainer/LevelsContainer
-	animation_player = $AnimationPlayer
+	if has_node("AnimationPlayer"):
+		animation_player = $AnimationPlayer
 	
 	# Connect signals
-	$TopBar/BackButton.pressed.connect(_on_back_button_pressed)
-	LevelManager.levels_loaded.connect(_on_levels_loaded)
+	if back_button:
+		back_button.pressed.connect(_on_back_button_pressed)
+	
+	# Connect to LevelManager signals if available
+	if LevelManager != null and LevelManager.has_signal("levels_loaded"):
+		LevelManager.levels_loaded.connect(_on_levels_loaded)
 	
 	# Play animations
-	if animation_player:
+	if animation_player and animation_player.has_animation("screen_appear"):
 		animation_player.play("screen_appear")
 	
 	# Load levels
@@ -32,16 +38,47 @@ func load_levels():
 	level_buttons.clear()
 	
 	# Get levels from the LevelManager
-	var levels = LevelManager.levels
+	var levels = []
+	if LevelManager != null and LevelManager.has_method("get_all_levels"):
+		levels = LevelManager.get_all_levels()
+	elif LevelManager != null and LevelManager.has_property("levels"):
+		levels = LevelManager.levels
+	
 	if levels.is_empty():
-		# If levels haven't been loaded yet, this will trigger the _on_levels_loaded signal
-		LevelManager.load_all_levels()
+		# If levels haven't been loaded yet, try to load them
+		if LevelManager != null and LevelManager.has_method("load_all_levels"):
+			LevelManager.load_all_levels()
+		else:
+			# Fallback to creating sample levels for testing
+			create_sample_levels()
 	else:
 		_on_levels_loaded(levels)
 
+# Create sample levels for testing
+func create_sample_levels():
+	var sample_levels = [
+		{
+			"id": "level_1",
+			"name": "Level 1: Wood Tower",
+			"description": "Build a simple tower with wooden blocks",
+			"unlocked": true,
+			"progress": {"stars": 0}
+		},
+		{
+			"id": "level_2",
+			"name": "Level 2: Stone & Wood",
+			"description": "Mix stone and wood for a stronger tower",
+			"unlocked": false,
+			"progress": {"stars": 0}
+		}
+	]
+	
+	_on_levels_loaded(sample_levels)
+
 # Handle back button to return to main menu
 func _on_back_button_pressed():
-	SoundManager.play("click")
+	if SoundManager != null and SoundManager.has_method("play"):
+		SoundManager.play("click")
 	
 	# Create a nice transition
 	if tween:
@@ -54,6 +91,16 @@ func _on_back_button_pressed():
 
 # Callback for when levels are loaded
 func _on_levels_loaded(levels):
+	# Check if our container exists
+	if not levels_container:
+		push_error("Level grid container not found!")
+		return
+		
+	# Check if we have the level button scene
+	if not level_button_scene:
+		push_error("Level button scene not found!")
+		return
+	
 	# Create and add a button for each level
 	for i in range(levels.size()):
 		var level = levels[i]
@@ -61,16 +108,20 @@ func _on_levels_loaded(levels):
 		levels_container.add_child(button)
 		level_buttons.append(button)
 		
-		# Configure the button
-		button.level_id = level.id
-		button.level_name = level.name
-		button.level_description = level.description
-		button.star_count = level.progress.stars if level.has("progress") else 0
-		button.is_locked = not level.unlocked if level.has("unlocked") else true
+		# Get level properties with fallbacks
+		var l_id = level.id if level.has("id") else "level_" + str(i+1)
+		var l_name = level.name if level.has("name") else "Level " + str(i+1)
+		var l_desc = level.description if level.has("description") else ""
+		var stars = level.progress.stars if level.has("progress") and level.progress.has("stars") else 0
+		var locked = not level.unlocked if level.has("unlocked") else (i > 0) # First level always unlocked
 		
-		# First level is always unlocked
+		# Make first level always unlocked for testing
 		if i == 0:
-			button.is_locked = false
+			locked = false
+		
+		# Use the configure method instead of setting properties directly
+		if button.has_method("configure"):
+			button.configure(l_id, l_name, l_desc, stars, locked)
 		
 		# Delayed appearance for nicer UI
 		button.modulate = Color(1, 1, 1, 0)
@@ -78,18 +129,22 @@ func _on_levels_loaded(levels):
 		button_tween.tween_property(button, "modulate", Color(1, 1, 1, 1), 0.3).set_delay(i * 0.05)
 		
 		# Connect the level button signal
-		button.level_selected.connect(_on_level_selected)
+		if button.has_signal("level_selected"):
+			print("Connecting level_selected signal for button: ", l_id)
+			button.level_selected.connect(_on_level_selected)
+		else:
+			push_error("Button missing level_selected signal!")
 
 # Handle level selection
 func _on_level_selected(level_id):
-	SoundManager.play("click")
+	print("Level selected: ", level_id)  # Debug print
 	
-	# Load the level data
-	var level_data = LevelManager.load_level(level_id)
-	if level_data.is_empty():
-		# Handle error
-		print("Error: Failed to load level %s" % level_id)
-		return
+	if SoundManager != null and SoundManager.has_method("play"):
+		SoundManager.play("click")
+	
+	# Tell the GameManager which level was selected
+	if GameManager != null and GameManager.has_method("select_level"):
+		GameManager.select_level(level_id)
 	
 	# Create a nice transition
 	if tween:
@@ -97,12 +152,6 @@ func _on_level_selected(level_id):
 	tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(self, "modulate", Color(1, 1, 1, 0), 0.5)
 	tween.tween_callback(func():
-		# Change to game scene and pass level data
-		var game_scene = load("res://scenes/game_screen.tscn").instantiate()
-		get_tree().root.add_child(game_scene)
-		get_tree().current_scene = game_scene
-		game_scene.load_level(level_data)
-		
-		# Remove this scene
-		queue_free()
+		# Change to game scene
+		get_tree().change_scene_to_file("res://scenes/game.tscn")
 	)

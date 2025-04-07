@@ -226,7 +226,8 @@ func place():
 		material.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
 		
 		# Play sound
-		SoundManager.play("place_block")
+		if SoundManager.has_method("play"):
+			SoundManager.play("place_block")
 		
 		emit_signal("block_placed")
 
@@ -274,13 +275,36 @@ func highlight(enable: bool):
 		if not BLOCK_TYPES.has(block_type) or not BLOCK_TYPES[block_type].emissive:
 			material.emission_enabled = false
 
+# Initialize the block with specific type and properties
+func initialize(type: String, preview: bool = false):
+	block_type = type
+	is_preview = preview
+	
+	# Initialize the block based on the type
+	if BLOCK_TYPES.has(type):
+		# Set properties directly without waiting for _ready
+		if not is_inside_tree():
+			# We'll handle everything in _ready later
+			return
+			
+		# Setup physics and visuals immediately if we're already in the tree
+		setup_physics()
+		setup_visuals()
+		setup_collision()
+		
+		if is_preview:
+			setup_as_preview()
+	
+	return self
+
 # Signal handlers
 func _on_body_entered(body):
 	if body is RigidBody3D and body != self:
 		body_entered_count += 1
 		
 		if is_placed and not is_being_placed:
-			SoundManager.play("block_hit")
+			if SoundManager.has_method("play"):
+				SoundManager.play("block_hit")
 			emit_signal("block_hit", body)
 
 func _on_body_exited(_body):

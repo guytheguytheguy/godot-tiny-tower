@@ -1,0 +1,125 @@
+[gd_scene load_steps=5 format=3 uid="uid://bqw2dpiwty4jc"]
+
+[ext_resource type="Script" path="res://scripts/scenes/game.gd" id="1_gupjc"]
+[ext_resource type="PackedScene" uid="uid://dd0yfwqo7q6lx" path="res://scenes/objects/block.tscn" id="2_3rtj8"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ybj6j"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0xyri"]
+size = Vector3(100, 1, 100)
+
+[node name="Game" type="Node3D"]
+script = ExtResource("1_gupjc")
+block_scene = ExtResource("2_3rtj8")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 20, 0)
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 3
+collision_mask = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("BoxShape3D_ybj6j")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("BoxMesh_0xyri")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 7, 12)
+current = true
+fov = 60.0
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ScoreLabel" type="Label" parent="UI"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 50.0
+grow_horizontal = 0
+text = "Score: 0"
+horizontal_alignment = 2
+
+[node name="MovesLabel" type="Label" parent="UI"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 20.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+text = "Moves: 0"
+horizontal_alignment = 1
+
+[node name="TimerLabel" type="Label" parent="UI"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 200.0
+offset_bottom = 50.0
+text = "Time: 00:00"
+
+[node name="BlockToolbar" type="HBoxContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="BlockButtons" type="HBoxContainer" parent="UI/BlockToolbar"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="WoodButton" type="Button" parent="UI/BlockToolbar/BlockButtons"]
+layout_mode = 2
+text = "Wood (1)"
+
+[node name="StoneButton" type="Button" parent="UI/BlockToolbar/BlockButtons"]
+layout_mode = 2
+text = "Stone (2)"
+
+[node name="MetalButton" type="Button" parent="UI/BlockToolbar/BlockButtons"]
+layout_mode = 2
+text = "Metal (3)"
+
+[node name="IceButton" type="Button" parent="UI/BlockToolbar/BlockButtons"]
+layout_mode = 2
+text = "Ice (4)"
+
+[node name="BlockPreview" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="GameTimer" type="Timer" parent="."]
+autostart = true
+
+[node name="StabilityTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="AudioListener3D" type="AudioListener3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 12)
+current = true

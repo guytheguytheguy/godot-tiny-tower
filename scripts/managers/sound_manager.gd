@@ -2,11 +2,11 @@ extends Node
 # Sound Manager - Handles all game audio
 
 var sound_players = {}
-var music_player = null
-var sound_volume = 1.0
-var music_volume = 1.0
-var sound_enabled = true
-var music_enabled = true
+var music_player: AudioStreamPlayer = null
+var sound_volume: float = 0.8
+var music_volume: float = 0.7
+var sound_enabled: bool = true
+var music_enabled: bool = true
 
 # Sound effect paths
 const SOUNDS = {
@@ -42,16 +42,19 @@ func _ready():
 	add_child(music_player)
 	
 	# Load user preferences
-	var settings = DataManager.load_settings()
+	var settings = null
+	if DataManager != null and DataManager.has_method("load_settings"):
+		settings = DataManager.load_settings()
+	
 	if settings:
 		if settings.has("sound_enabled"):
-			sound_enabled = settings.sound_enabled
+			sound_enabled = settings["sound_enabled"]
 		if settings.has("music_enabled"):
-			music_enabled = settings.music_enabled
+			music_enabled = settings["music_enabled"]
 		if settings.has("sound_volume"):
-			set_sound_volume(settings.sound_volume)
+			set_sound_volume(settings["sound_volume"])
 		if settings.has("music_volume"):
-			set_music_volume(settings.music_volume)
+			set_music_volume(settings["music_volume"])
 
 # Play a sound effect
 func play(sound_name: String) -> void:
@@ -88,35 +91,62 @@ func stop_music() -> void:
 	if music_player.playing:
 		music_player.stop()
 
-# Set sound effect volume
-func set_sound_volume(volume: float) -> void:
+# Set sound volume (0.0 to 1.0)
+func set_sound_volume(volume: float):
 	sound_volume = clamp(volume, 0.0, 1.0)
+	
+	# Update volume for all sound players
 	for player in sound_players.keys():
-		player.volume_db = linear_to_db(sound_volume)
+		if player is AudioStreamPlayer:
+			player.volume_db = linear_to_db(sound_volume)
 	
 	# Save to settings
-	var settings = DataManager.load_settings() or {}
-	settings.sound_volume = sound_volume
-	DataManager.save_settings(settings)
+	var settings = null
+	if DataManager != null and DataManager.has_method("load_settings"):
+		settings = DataManager.load_settings() or {}
+	else:
+		settings = {}
+	
+	if settings is Dictionary:
+		settings["sound_volume"] = sound_volume
+		if DataManager != null and DataManager.has_method("save_settings"):
+			DataManager.save_settings(settings)
 
-# Set music volume
-func set_music_volume(volume: float) -> void:
+# Set music volume (0.0 to 1.0)
+func set_music_volume(volume: float):
 	music_volume = clamp(volume, 0.0, 1.0)
-	music_player.volume_db = linear_to_db(music_volume)
+	
+	# Update music player volume
+	if music_player != null:
+		music_player.volume_db = linear_to_db(music_volume)
 	
 	# Save to settings
-	var settings = DataManager.load_settings() or {}
-	settings.music_volume = music_volume
-	DataManager.save_settings(settings)
+	var settings = null
+	if DataManager != null and DataManager.has_method("load_settings"):
+		settings = DataManager.load_settings() or {}
+	else:
+		settings = {}
+	
+	if settings is Dictionary:
+		settings["music_volume"] = music_volume
+		if DataManager != null and DataManager.has_method("save_settings"):
+			DataManager.save_settings(settings)
 
 # Toggle sound effects
 func toggle_sound() -> void:
 	sound_enabled = !sound_enabled
 	
 	# Save to settings
-	var settings = DataManager.load_settings() or {}
-	settings.sound_enabled = sound_enabled
-	DataManager.save_settings(settings)
+	var settings = null
+	if DataManager != null and DataManager.has_method("load_settings"):
+		settings = DataManager.load_settings() or {}
+	else:
+		settings = {}
+	
+	if settings is Dictionary:
+		settings["sound_enabled"] = sound_enabled
+		if DataManager != null and DataManager.has_method("save_settings"):
+			DataManager.save_settings(settings)
 
 # Toggle music
 func toggle_music() -> void:
@@ -128,9 +158,16 @@ func toggle_music() -> void:
 		music_player.stop()
 	
 	# Save to settings
-	var settings = DataManager.load_settings() or {}
-	settings.music_enabled = music_enabled
-	DataManager.save_settings(settings)
+	var settings = null
+	if DataManager != null and DataManager.has_method("load_settings"):
+		settings = DataManager.load_settings() or {}
+	else:
+		settings = {}
+	
+	if settings is Dictionary:
+		settings["music_enabled"] = music_enabled
+		if DataManager != null and DataManager.has_method("save_settings"):
+			DataManager.save_settings(settings)
 
 # Find an available sound player from the pool
 func get_available_player() -> AudioStreamPlayer:

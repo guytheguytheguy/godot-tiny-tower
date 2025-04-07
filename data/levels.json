@@ -1,0 +1,82 @@
+{
+  "level_1": {
+    "id": "level_1",
+    "name": "Level 1: Wooden Tower",
+    "description": "Build a simple tower with wooden blocks",
+    "difficulty": 1,
+    "target_height": 5,
+    "time_limit": 120,
+    "blocks": {
+      "wood": 10,
+      "stone": 2,
+      "metal": 0,
+      "ice": 0
+    },
+    "stars": [
+      {"requirement": "height", "value": 5},
+      {"requirement": "time", "value": 60},
+      {"requirement": "remaining_blocks", "value": 3}
+    ],
+    "unlocks": ["level_2"]
+  },
+  "level_2": {
+    "id": "level_2",
+    "name": "Level 2: Stone & Wood",
+    "description": "Mix stone and wood for a stronger tower",
+    "difficulty": 2,
+    "target_height": 8,
+    "time_limit": 180,
+    "blocks": {
+      "wood": 8,
+      "stone": 5,
+      "metal": 0,
+      "ice": 0
+    },
+    "stars": [
+      {"requirement": "height", "value": 8},
+      {"requirement": "time", "value": 120},
+      {"requirement": "remaining_blocks", "value": 2}
+    ],
+    "unlocks": ["level_3"]
+  },
+  "level_3": {
+    "id": "level_3",
+    "name": "Level 3: Metal Support",
+    "description": "Use metal blocks for a stronger foundation",
+    "difficulty": 3,
+    "target_height": 10,
+    "time_limit": 240,
+    "blocks": {
+      "wood": 8,
+      "stone": 5,
+      "metal": 2,
+      "ice": 0
+    },
+    "stars": [
+      {"requirement": "height", "value": 10},
+      {"requirement": "time", "value": 180},
+      {"requirement": "remaining_blocks", "value": 2}
+    ],
+    "unlocks": ["level_4"]
+  },
+  "level_4": {
+    "id": "level_4",
+    "name": "Level 4: Ice Challenge",
+    "description": "Slippery ice blocks make things interesting",
+    "difficulty": 4,
+    "target_height": 12,
+    "time_limit": 300,
+    "blocks": {
+      "wood": 6,
+      "stone": 6,
+      "metal": 3,
+      "ice": 3
+    },
+    "stars": [
+      {"requirement": "height", "value": 12},
+      {"requirement": "time", "value": 240},
+      {"requirement": "remaining_blocks", "value": 3}
+    ],
+    "unlocks": []
+  }
+}

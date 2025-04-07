@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://f0s8mw5m7yjr"]
+
+[ext_resource type="Script" path="res://scripts/ui/level_button.gd" id="1_tfhm7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8jyyo"]
+bg_color = Color(0.2, 0.3, 0.4, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.25)
+shadow_size = 4
+shadow_offset = Vector2(2, 2)
+
+[node name="LevelButton" type="Button"]
+custom_minimum_size = Vector2(200, 150)
+theme_override_styles/normal = SubResource("StyleBoxFlat_8jyyo")
+theme_override_styles/hover = SubResource("StyleBoxFlat_8jyyo")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_8jyyo")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_8jyyo")
+theme_override_font_sizes/font_size = 20
+text = "Level 1"
+script = ExtResource("1_tfhm7")

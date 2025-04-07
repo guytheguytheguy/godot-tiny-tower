@@ -1,0 +1,75 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2d8p4kyjcfx3"]
+
+[ext_resource type="Script" path="res://scripts/scenes/level_select.gd" id="1_c21t8"]
+
+[node name="LevelSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_c21t8")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.25, 0.3, 0.4, 1)
+
+[node name="TitleContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 120.0
+grow_horizontal = 2
+
+[node name="Title" type="Label" parent="TitleContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "SELECT LEVEL"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="TitleContainer"]
+layout_mode = 2
+text = "Choose a level to play"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 120.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LevelsGrid" type="GridContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 3
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="BackButton" type="Button" parent="ButtonsContainer"]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+text = "BACK"
