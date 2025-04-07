@@ -1,0 +1,237 @@
+[gd_scene load_steps=9 format=3 uid="uid://dcrfj3v25h6sn"]
+
+[ext_resource type="Script" path="res://scripts/scenes/game_screen.gd" id="1_ij4tn"]
+[ext_resource type="Script" path="res://scripts/ui/game_hud.gd" id="2_bk8fq"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h0n2d"]
+albedo_color = Color(0.329412, 0.329412, 0.329412, 1)
+metallic = 0.1
+roughness = 0.25
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_lvjgh"]
+material = SubResource("StandardMaterial3D_h0n2d")
+size = Vector2(30, 30)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uv5y6"]
+size = Vector3(30, 1, 30)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7fj1d"]
+size = Vector3(10, 1, 10)
+
+[sub_resource type="Environment" id="Environment_3a6lf"]
+background_mode = 1
+background_color = Color(0.2, 0.3, 0.4, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.5, 0.5, 0.5, 1)
+tonemap_mode = 2
+ssao_enabled = true
+glow_enabled = true
+fog_enabled = true
+fog_light_color = Color(0.5, 0.6, 0.7, 1)
+fog_density = 0.001
+fog_sky_affect = 0.0
+volumetric_fog_density = 0.0
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_xmb7q"]
+auto_exposure_enabled = true
+dof_blur_far_enabled = true
+dof_blur_far_distance = 35.0
+dof_blur_far_transition = 10.0
+dof_blur_amount = 0.08
+
+[node name="GameScreen" type="Node3D"]
+script = ExtResource("1_ij4tn")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 1
+collision_mask = 1
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("PlaneMesh_lvjgh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_uv5y6")
+
+[node name="PlacementArea" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlacementArea"]
+shape = SubResource("BoxShape3D_7fj1d")
+
+[node name="BlocksContainer" type="Node3D" parent="."]
+
+[node name="CameraPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 5, 15)
+attributes = SubResource("CameraAttributesPractical_xmb7q")
+current = true
+fov = 40.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 10)
+light_energy = 1.5
+shadow_enabled = true
+shadow_bias = 0.05
+directional_shadow_max_distance = 50.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_3a6lf")
+
+[node name="GameHUD" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_bk8fq")
+
+[node name="TopPanel" type="Panel" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 60.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GameHUD/TopPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="ScoreContainer" type="VBoxContainer" parent="GameHUD/TopPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Label" type="Label" parent="GameHUD/TopPanel/HBoxContainer/ScoreContainer"]
+layout_mode = 2
+text = "SCORE"
+horizontal_alignment = 1
+
+[node name="ScoreValue" type="Label" parent="GameHUD/TopPanel/HBoxContainer/ScoreContainer"]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="MovesContainer" type="VBoxContainer" parent="GameHUD/TopPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Label" type="Label" parent="GameHUD/TopPanel/HBoxContainer/MovesContainer"]
+layout_mode = 2
+text = "MOVES"
+horizontal_alignment = 1
+
+[node name="MovesValue" type="Label" parent="GameHUD/TopPanel/HBoxContainer/MovesContainer"]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="TimeContainer" type="VBoxContainer" parent="GameHUD/TopPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Label" type="Label" parent="GameHUD/TopPanel/HBoxContainer/TimeContainer"]
+layout_mode = 2
+text = "TIME"
+horizontal_alignment = 1
+
+[node name="TimeValue" type="Label" parent="GameHUD/TopPanel/HBoxContainer/TimeContainer"]
+layout_mode = 2
+text = "00:00"
+horizontal_alignment = 1
+
+[node name="BlockTypesPanel" type="Panel" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -300.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameHUD/BlockTypesPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="GameHUD/BlockTypesPanel/VBoxContainer"]
+layout_mode = 2
+text = "BLOCK TYPES"
+horizontal_alignment = 1
+
+[node name="BlockButtons" type="GridContainer" parent="GameHUD/BlockTypesPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 2
+
+[node name="PauseButton" type="Button" parent="GameHUD"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 80.0
+offset_right = 120.0
+offset_bottom = 120.0
+text = "PAUSE"
+
+[node name="RestartButton" type="Button" parent="GameHUD"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 140.0
+offset_right = 120.0
+offset_bottom = 180.0
+text = "RESTART"
+
+[node name="MenuButton" type="Button" parent="GameHUD"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 200.0
+offset_right = 120.0
+offset_bottom = 240.0
+text = "MENU"
+
+[node name="ControlsInfo" type="Panel" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -100.0
+offset_right = 320.0
+offset_bottom = -20.0
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="GameHUD/ControlsInfo"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "CONTROLS:
+Left Click - Place Block
+Right Click & Drag - Rotate Camera
+Q/E - Rotate Block
+1-6 - Change Block Type"
+vertical_alignment = 1

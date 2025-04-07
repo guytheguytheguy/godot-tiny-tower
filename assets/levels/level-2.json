@@ -1,0 +1,44 @@
+{
+  "id": "level-2",
+  "name": "Balance Act",
+  "description": "Build a balanced tower with different block types",
+  "min_score": 200,
+  "time_limit": 180,
+  "star_requirements": [200, 350, 500],
+  "blocks": [
+    {
+      "id": "ground",
+      "type": "stone",
+      "position": [0, 0, 0],
+      "rotation": [0, 0, 0],
+      "size": [10, 0.5, 10],
+      "is_static": true
+    },
+    {
+      "id": "obstacle-1",
+      "type": "metal",
+      "position": [2, 1, 2],
+      "rotation": [0, 30, 0],
+      "size": [1, 0.5, 2],
+      "is_static": true
+    },
+    {
+      "id": "obstacle-2",
+      "type": "metal",
+      "position": [-2, 1, -2],
+      "rotation": [0, 45, 0],
+      "size": [1, 0.5, 2],
+      "is_static": true
+    }
+  ],
+  "available_blocks": ["wood", "stone", "metal", "ice"],
+  "win_condition": {
+    "type": "height",
+    "value": 8
+  },
+  "physics": {
+    "gravity": 25.0,
+    "friction": 0.7,
+    "restitution": 0.2
+  }
+}

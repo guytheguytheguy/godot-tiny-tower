@@ -1,0 +1,28 @@
+{
+  "id": "level-1",
+  "name": "Tutorial",
+  "description": "Learn how to stack blocks to build a tower",
+  "min_score": 100,
+  "time_limit": 120,
+  "star_requirements": [100, 200, 300],
+  "blocks": [
+    {
+      "id": "ground",
+      "type": "stone",
+      "position": [0, 0, 0],
+      "rotation": [0, 0, 0],
+      "size": [10, 0.5, 10],
+      "is_static": true
+    }
+  ],
+  "available_blocks": ["wood", "stone"],
+  "win_condition": {
+    "type": "height",
+    "value": 5
+  },
+  "physics": {
+    "gravity": 25.0,
+    "friction": 0.8,
+    "restitution": 0.1
+  }
+}
