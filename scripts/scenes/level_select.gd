@@ -59,15 +59,22 @@ func create_sample_levels():
 	var sample_levels = [
 		{
 			"id": "level_1",
-			"name": "Level 1: Wood Tower",
-			"description": "Build a simple tower with wooden blocks",
+			"name": "Level 1: Basic Removal",
+			"description": "Remove blocks from a wooden tower without letting it fall",
 			"unlocked": true,
 			"progress": {"stars": 0}
 		},
 		{
 			"id": "level_2",
-			"name": "Level 2: Stone & Wood",
-			"description": "Mix stone and wood for a stronger tower",
+			"name": "Level 2: Mixed Materials",
+			"description": "Remove blocks from a tower with mixed materials",
+			"unlocked": false,
+			"progress": {"stars": 0}
+		},
+		{
+			"id": "level_3",
+			"name": "Level 3: Tall Structure",
+			"description": "Take on a taller tower with more blocks to remove",
 			"unlocked": false,
 			"progress": {"stars": 0}
 		}

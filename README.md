@@ -1,8 +1,8 @@
 # Tiny Tower - Godot Edition
 
-This is a port of the Tiny Tower game from React/Three.js to Godot Engine using GDScript. The original web-based game has been fully reimplemented as a native application while preserving all the core gameplay mechanics and features.
+This is a port of the Tiny Tower game from React/Three.js to Godot Engine using GDScript, with a twist - now transformed into a Jenga-style block removal game. Instead of building towers, players must carefully remove blocks from pre-built structures without causing them to collapse.
 
-## About the Port
+## About the Port & Gameplay Revamp
 
 ### Why Godot?
 
@@ -16,13 +16,15 @@ Godot Engine offers several advantages for a physics-based game like Tiny Tower:
 
 4. **Simplified Development**: The port eliminates the TypeScript complexities and React component lifecycle issues that were causing blocks to unmount/remount unexpectedly in the original version.
 
-### What Was Preserved
+### New Gameplay Mechanics
 
-- Complete game mechanics and physics
-- Level progression system with stars
-- Block types with different physical properties
-- Visual design and UI layout
-- Sound effects and music
+The game now focuses on strategic block removal rather than tower building:
+
+- **Pre-built Towers**: Each level starts with a pre-built tower structure
+- **Block Selection**: Players select which blocks to remove from the structure
+- **Physics Challenges**: Removing blocks affects the tower's stability in realistic ways
+- **Risk vs. Reward**: Players must balance removing more blocks (higher score) with the risk of tower collapse
+- **Strategic Thinking**: Different block materials and positions present unique challenges
 
 ## Project Structure
 
@@ -52,13 +54,13 @@ godot-tiny-tower/
 ### Manager Singletons
 
 - **GameManager**: Handles game state, scoring, and level progression
-- **LevelManager**: Loads and manages level data
+- **LevelManager**: Loads and manages level data including tower configurations
 - **SoundManager**: Manages sound effects and music
 - **DataManager**: Handles saving/loading game progress
 
 ### Game Objects
 
-- **Block**: The core physics object that players stack to build towers
+- **Block**: The core physics object that players remove from towers
   - Different block types (wood, stone, metal, ice, glass, rubber)
   - Physics properties (mass, friction, restitution)
   - Visual appearance (colors, textures)
@@ -67,7 +69,7 @@ godot-tiny-tower/
 
 - **Main Menu**: Starting point with options to play, adjust settings, etc.
 - **Level Select**: Browse and select levels to play
-- **Game Screen**: Main gameplay where blocks are stacked
+- **Game Screen**: Main gameplay where players remove blocks from towers
 - **Level Complete**: Shows results after completing a level
 
 ## How to Open in Godot
@@ -80,26 +82,26 @@ godot-tiny-tower/
 
 ## Development Notes
 
-- The port uses Godot's built-in physics engine instead of Cannon.js
-- Block rendering uses Godot's mesh rendering system instead of Three.js
+- The game uses Godot's built-in physics engine for realistic block interactions
+- Tower configurations are defined in the level data, allowing for various tower designs
+- Block selection and removal is handled through raycasting and physics interactions
 - Game state is managed through Godot's signals (similar to events in React)
-- Level data is stored in JSON format similar to the original game
 
-## Comparison to Original React Version
+## Gameplay Mechanics
 
-This Godot port resolves several key issues from the original React/Three.js implementation:
-
-1. **Stable Physics**: No more issues with blocks disappearing or physics objects being unmounted incorrectly
-2. **No TypeScript Errors**: The original had various TypeScript integration issues with React Three Fiber
-3. **Better Performance**: Native rendering and physics simulation instead of web-based
-4. **Simplified Code Structure**: More direct game logic without React component lifecycle complications
+1. **Selection**: Click on a block to select it for removal
+2. **Removal**: Confirm removal of the selected block
+3. **Physics**: The tower will react realistically based on structural integrity
+4. **Scoring**: Points are awarded based on how many blocks are successfully removed
+5. **Stars**: Earn up to three stars based on blocks removed and tower height maintained
 
 ## Future Enhancements
 
-- Additional block types and level mechanics
-- More advanced visual effects
-- Mobile touch controls
-- Multiplayer capabilities
+- Additional tower configurations and block types
+- Special blocks with unique properties (magnetic, explosive, etc.)
+- Time-based challenges
+- Mobile touch controls optimization
+- Multiplayer competitive mode
 
 ---
 

@@ -9,13 +9,13 @@ var animation_player: AnimationPlayer
 var tween: Tween
 var stars_container: HBoxContainer
 var score_value: Label
-var moves_value: Label
+var blocks_removed_value: Label
 var time_value: Label
 var next_button: Button
 
 var level_id: String = ""
 var score: int = 0
-var moves: int = 0
+var blocks_removed: int = 0
 var time_seconds: float = 0
 var stars: int = 0
 var has_next_level: bool = false
@@ -26,9 +26,14 @@ func _ready():
 	animation_player = $AnimationPlayer
 	stars_container = $ContentPanel/VBoxContainer/StarsContainer
 	score_value = $ContentPanel/VBoxContainer/StatsContainer/ScoreContainer/ScoreValue
-	moves_value = $ContentPanel/VBoxContainer/StatsContainer/MovesContainer/MovesValue
+	blocks_removed_value = $ContentPanel/VBoxContainer/StatsContainer/MovesContainer/MovesValue
 	time_value = $ContentPanel/VBoxContainer/StatsContainer/TimeContainer/TimeValue
 	next_button = $ContentPanel/VBoxContainer/ButtonsContainer/NextButton
+	
+	# Update the label text to reflect blocks removed
+	var moves_label = $ContentPanel/VBoxContainer/StatsContainer/MovesContainer/MovesLabel
+	if moves_label:
+		moves_label.text = "Blocks Removed:"
 	
 	# Connect button signals
 	$ContentPanel/VBoxContainer/ButtonsContainer/NextButton.pressed.connect(_on_next_button_pressed)
@@ -39,33 +44,56 @@ func _ready():
 	next_button.visible = false
 	
 	# Play victory music
-	SoundManager.play("level_complete")
-	SoundManager.play_music("bgm_victory")
+	if SoundManager.has_method("play"):
+		SoundManager.play("level_complete")
+	if SoundManager.has_method("play_music"):
+		SoundManager.play_music("bgm_victory")
 	
 	# Show the screen with animation
 	if animation_player:
 		animation_player.play("screen_appear")
 
 # Initialize with level results
-func initialize(p_level_id: String, p_score: int, p_moves: int, p_time: float, p_stars: int):
+func initialize(p_level_id: String, p_score: int, p_blocks_removed: int, p_time: float, p_stars: int):
 	level_id = p_level_id
 	score = p_score
-	moves = p_moves
+	blocks_removed = p_blocks_removed
 	time_seconds = p_time
 	stars = p_stars
 	
 	# Check if there's a next level
-	var next_level_id = LevelManager.get_next_level_id()
+	var next_level_id = ""
+	if LevelManager.has_method("get_next_level_id"):
+		next_level_id = LevelManager.get_next_level_id()
 	has_next_level = !next_level_id.is_empty()
 	
 	# Update UI
 	update_ui()
 
+# Backward compatibility method - when called from old scripts
+func setup(p_stars: int, p_score: int, p_time: float, p_blocks_removed: int):
+	stars = p_stars
+	score = p_score
+	time_seconds = p_time
+	blocks_removed = p_blocks_removed
+	
+	# Check if there's a next level
+	var next_level_id = ""
+	if LevelManager.has_method("get_next_level_id"):
+		next_level_id = LevelManager.get_next_level_id()
+	has_next_level = !next_level_id.is_empty()
+	
+	# Update UI once we're in the tree
+	if is_inside_tree():
+		update_ui()
+	else:
+		call_deferred("update_ui")
+
 # Update the UI with level results
 func update_ui():
 	# Set statistics
 	score_value.text = str(score)
-	moves_value.text = str(moves)
+	blocks_removed_value.text = str(blocks_removed)
 	time_value.text = format_time(time_seconds)
 	
 	# Handle next button
@@ -107,7 +135,8 @@ func update_ui():
 # Play star sound with delay
 func _play_delayed_star_sound(delay):
 	await get_tree().create_timer(delay).timeout
-	SoundManager.play("star_earned")
+	if SoundManager.has_method("play"):
+		SoundManager.play("star_earned")
 
 # Format time as MM:SS
 func format_time(seconds: float) -> String:
@@ -117,17 +146,20 @@ func format_time(seconds: float) -> String:
 
 # Button handlers
 func _on_next_button_pressed():
-	SoundManager.play("click")
+	if SoundManager.has_method("play"):
+		SoundManager.play("click")
 	emit_signal("next_level_selected")
 	transition_out()
 
 func _on_retry_button_pressed():
-	SoundManager.play("click")
+	if SoundManager.has_method("play"):
+		SoundManager.play("click")
 	emit_signal("replay_selected")
 	transition_out()
 
 func _on_menu_button_pressed():
-	SoundManager.play("click")
+	if SoundManager.has_method("play"):
+		SoundManager.play("click")
 	emit_signal("menu_selected")
 	transition_out()
 

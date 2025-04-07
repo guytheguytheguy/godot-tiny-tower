@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://c2jxvtdyhevnx"]
+
+[ext_resource type="Shader" path="res://assets/materials/wood_shader.gdshader" id="1_5nj5n"]
+[ext_resource type="Texture2D" uid="uid://dt4ivf1ovuug1" path="res://assets/textures/wood_texture.png" id="2_m1h5t"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_5nj5n")
+shader_parameter/wood_color = Color(0.886275, 0.65098, 0.403922, 1)
+shader_parameter/wood_color_dark = Color(0.65098, 0.435294, 0.239216, 1)
+shader_parameter/grain_strength = 0.4
+shader_parameter/roughness = 0.65
+shader_parameter/specular = 0.35
+shader_parameter/rim_strength = 0.2
+shader_parameter/selected = false
+shader_parameter/selected_glow = 0.0
+shader_parameter/wood_texture = ExtResource("2_m1h5t")

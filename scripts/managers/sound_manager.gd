@@ -11,9 +11,12 @@ var music_enabled: bool = true
 # Sound effect paths
 const SOUNDS = {
 	"click": "res://assets/sounds/ui/click.wav",
-	"place_block": "res://assets/sounds/game/place_block.wav",
+	"place_block": "res://assets/sounds/game/place_block.wav",  # Keep for backward compatibility
+	"remove_block": "res://assets/sounds/game/place_block.wav", # Reuse existing sound for now
+	"select_block": "res://assets/sounds/ui/click.wav",         # Reuse existing sound for block selection
 	"block_hit": "res://assets/sounds/game/block_hit.wav",
 	"block_fall": "res://assets/sounds/game/block_fall.wav",
+	"tower_collapse": "res://assets/sounds/game/block_fall.wav", # Reuse existing sound
 	"level_complete": "res://assets/sounds/game/level_complete.wav",
 	"game_over": "res://assets/sounds/game/game_over.wav",
 	"star_earned": "res://assets/sounds/game/star_earned.wav",

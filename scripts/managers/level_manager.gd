@@ -15,20 +15,19 @@ var current_level_index = -1
 # {
 #   "id": "level_1",
 #   "name": "Level 1: Wooden Tower",
-#   "description": "Build a simple tower with wooden blocks",
+#   "description": "Remove blocks without toppling the tower",
 #   "difficulty": 1,
-#   "target_height": 5,
+#   "tower_layers": 5,
 #   "time_limit": 120,
-#   "blocks": {
-#     "wood": 10,
-#     "stone": 2,
-#     "metal": 0,
-#     "ice": 0
+#   "tower_config": {
+#     "blocks_per_layer": 3,
+#     "layout": "standard", // standard, alternating, random
+#     "block_types": ["wood", "stone"]
 #   },
 #   "stars": [
-#     {"requirement": "height", "value": 5},
+#     {"requirement": "blocks_removed", "value": 3},
 #     {"requirement": "time", "value": 60},
-#     {"requirement": "remaining_blocks", "value": 3}
+#     {"requirement": "tower_height", "value": 2}
 #   ],
 #   "unlocks": ["level_2"]
 # }
@@ -83,42 +82,59 @@ func create_sample_levels() -> void:
 		{
 			"id": "level_1",
 			"name": "Level 1: Wooden Tower",
-			"description": "Build a simple tower with wooden blocks",
+			"description": "Remove as many blocks as you can without toppling the tower",
 			"difficulty": 1,
-			"target_height": 5,
+			"tower_layers": 4,
 			"time_limit": 120,
-			"blocks": {
-				"wood": 10,
-				"stone": 2,
-				"metal": 0,
-				"ice": 0
+			"tower_config": {
+				"blocks_per_layer": 3,
+				"layout": "standard",
+				"block_types": ["wood"]
 			},
 			"stars": [
-				{"requirement": "height", "value": 5},
+				{"requirement": "blocks_removed", "value": 3},
 				{"requirement": "time", "value": 60},
-				{"requirement": "remaining_blocks", "value": 3}
+				{"requirement": "tower_height", "value": 2}
 			],
 			"unlocks": ["level_2"]
 		},
 		{
 			"id": "level_2",
-			"name": "Level 2: Stone & Wood",
-			"description": "Mix stone and wood for a stronger tower",
+			"name": "Level 2: Mixed Materials",
+			"description": "Stone blocks are heavier and affect stability differently",
 			"difficulty": 2,
-			"target_height": 8,
+			"tower_layers": 5,
 			"time_limit": 180,
-			"blocks": {
-				"wood": 8,
-				"stone": 5,
-				"metal": 0,
-				"ice": 0
+			"tower_config": {
+				"blocks_per_layer": 3,
+				"layout": "alternating",
+				"block_types": ["wood", "stone"]
 			},
 			"stars": [
-				{"requirement": "height", "value": 8},
+				{"requirement": "blocks_removed", "value": 4},
 				{"requirement": "time", "value": 120},
-				{"requirement": "remaining_blocks", "value": 2}
+				{"requirement": "tower_height", "value": 3}
 			],
 			"unlocks": ["level_3"]
+		},
+		{
+			"id": "level_3",
+			"name": "Level 3: Complex Tower",
+			"description": "A larger tower with more complex materials",
+			"difficulty": 3,
+			"tower_layers": 7,
+			"time_limit": 240,
+			"tower_config": {
+				"blocks_per_layer": 3,
+				"layout": "random",
+				"block_types": ["wood", "stone", "metal", "ice"]
+			},
+			"stars": [
+				{"requirement": "blocks_removed", "value": 6},
+				{"requirement": "time", "value": 180},
+				{"requirement": "tower_height", "value": 4}
+			],
+			"unlocks": []
 		}
 	]
 
@@ -136,7 +152,7 @@ func add_progress_data_to_levels() -> void:
 				"completed": false,
 				"stars": 0,
 				"score": 0,
-				"moves": 0,
+				"blocks_removed": 0,
 				"time": 0
 			}
 			level["unlocked"] = (i == 0) # First level is always unlocked
@@ -154,7 +170,7 @@ func add_progress_data_to_levels() -> void:
 					"completed": false,
 					"stars": 0,
 					"score": 0,
-					"moves": 0,
+					"blocks_removed": 0,
 					"time": 0
 				}
 				
@@ -205,7 +221,7 @@ func is_level_completed(level_id: String) -> bool:
 	return false
 
 # Calculate stars earned for a level
-func calculate_stars(level_id: String, score: int, time: float, remaining_blocks: int) -> int:
+func calculate_stars(level_id: String, blocks_removed: int, time: float, remaining_height: int) -> int:
 	var level = get_level_by_id(level_id)
 	if not level or not level.has("stars"):
 		return 0
@@ -216,11 +232,11 @@ func calculate_stars(level_id: String, score: int, time: float, remaining_blocks
 		var requirement = star_req.requirement
 		var value = star_req.value
 		
-		if requirement == "height" and score >= value:
+		if requirement == "blocks_removed" and blocks_removed >= value:
 			stars += 1
 		elif requirement == "time" and time <= value:
 			stars += 1
-		elif requirement == "remaining_blocks" and remaining_blocks >= value:
+		elif requirement == "tower_height" and remaining_height >= value:
 			stars += 1
 	
 	return stars

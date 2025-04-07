@@ -1,0 +1,163 @@
+[gd_scene load_steps=9 format=3 uid="uid://c7rtqkdwyd10s"]
+
+[ext_resource type="PackedScene" uid="uid://cw8g7vsmuvhb4" path="res://scenes/effects/dust_particles.tscn" id="1_4qkco"]
+
+[sub_resource type="GDScript" id="GDScript_3lixb"]
+script/source = "extends Node3D
+
+signal effect_completed
+
+@export var base_dust_amount = 30
+@export var dust_spread_radius = 1.5
+@export var dust_height_range = Vector2(0.0, 2.0)
+@export var camera_shake_strength = 0.5
+@export var camera_shake_duration = 0.8
+@export var play_on_ready = false
+
+var dust_particles_scene: PackedScene = preload(\"res://scenes/effects/dust_particles.tscn\")
+var rng = RandomNumberGenerator.new()
+var particles_list = []
+var main_particles
+
+# Called when the node enters the scene tree for the first time
+func _ready():
+	if play_on_ready:
+		play()
+
+# Play the collapse effect
+func play():
+	# Create base dust cloud
+	main_particles = $CenterDustCloud
+	main_particles.emitting = true
+	
+	# Create additional dust particles around the tower base
+	spawn_dust_particles()
+	
+	# Camera shake effect - emit signal for game to handle
+	get_tree().call_group(\"game_camera\", \"shake\", camera_shake_strength, camera_shake_duration)
+	
+	# Play sound effect
+	if SoundManager.has_method(\"play\"):
+		SoundManager.play(\"tower_collapse\")
+	
+	# Set up timer for effect completion
+	var timer = Timer.new()
+	add_child(timer)
+	timer.wait_time = 3.0
+	timer.one_shot = true
+	timer.timeout.connect(func(): 
+		emit_signal(\"effect_completed\")
+		# Don't destroy - let the game manager handle this
+	)
+	timer.start()
+
+# Spawn dust particles at various points
+func spawn_dust_particles():
+	for i in range(6):
+		var angle = rng.randf() * 2.0 * PI
+		var distance = rng.randf_range(0.5, dust_spread_radius)
+		var height = rng.randf_range(dust_height_range.x, dust_height_range.y)
+		
+		var pos = Vector3(
+			distance * cos(angle),
+			height,
+			distance * sin(angle)
+		)
+		
+		var particles = dust_particles_scene.instantiate()
+		add_child(particles)
+		particles.position = pos
+		particles.amount = rng.randi_range(10, 20)
+		particles.emitting = true
+		particles_list.append(particles)
+		
+	# Delayed secondary particles for a more dynamic effect
+	var timer = Timer.new()
+	add_child(timer)
+	timer.wait_time = 0.2
+	timer.one_shot = true
+	timer.timeout.connect(func(): spawn_secondary_particles())
+	timer.start()
+
+# Second wave of particles for a more dynamic effect
+func spawn_secondary_particles():
+	for i in range(4):
+		var angle = rng.randf() * 2.0 * PI
+		var distance = rng.randf_range(0.2, dust_spread_radius * 0.8)
+		var height = rng.randf_range(dust_height_range.x + 0.5, dust_height_range.y + 0.8)
+		
+		var pos = Vector3(
+			distance * cos(angle),
+			height,
+			distance * sin(angle)
+		)
+		
+		var particles = dust_particles_scene.instantiate()
+		add_child(particles)
+		particles.position = pos
+		particles.amount = rng.randi_range(8, 15)
+		particles.emitting = true
+		particles_list.append(particles)
+"
+
+[sub_resource type="Curve" id="Curve_gd0dj"]
+_data = [Vector2(0, 0), 0.0, 2.0, 0, 0, Vector2(0.2, 0.6), 1.0, 1.0, 0, 0, Vector2(0.8, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_eokwy"]
+curve = SubResource("Curve_gd0dj")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_7s41r"]
+lifetime_randomness = 0.4
+emission_shape = 1
+emission_sphere_radius = 0.8
+direction = Vector3(0, 1, 0)
+spread = 60.0
+gravity = Vector3(0, 0.2, 0)
+initial_velocity_min = 0.8
+initial_velocity_max = 1.8
+angular_velocity_min = -40.0
+angular_velocity_max = 40.0
+damping_min = 0.5
+damping_max = 1.5
+angle_min = -180.0
+angle_max = 180.0
+scale_min = 0.6
+scale_max = 1.2
+scale_curve = SubResource("CurveTexture_eokwy")
+color = Color(0.886275, 0.85098, 0.807843, 0.85098)
+turbulence_enabled = true
+turbulence_noise_strength = 0.3
+turbulence_noise_scale = 2.0
+collision_mode = 1
+collision_friction = 0.2
+collision_bounce = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eghcd"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("1_4qkco")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_fvbul"]
+material = SubResource("StandardMaterial3D_eghcd")
+size = Vector2(0.5, 0.5)
+
+[node name="TowerCollapseEffect" type="Node3D"]
+script = SubResource("GDScript_3lixb")
+
+[node name="CenterDustCloud" type="GPUParticles3D" parent="."]
+emitting = false
+amount = 50
+lifetime = 2.0
+one_shot = true
+explosiveness = 0.7
+visibility_aabb = AABB(-4, -4, -4, 8, 8, 8)
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_7s41r")
+draw_pass_1 = SubResource("QuadMesh_fvbul")

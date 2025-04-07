@@ -1,0 +1,73 @@
+[gd_scene load_steps=5 format=3 uid="uid://cw8g7vsmuvhb4"]
+
+[ext_resource type="Script" path="res://scripts/effects/dust_particles.gd" id="1_dust_script"]
+
+[sub_resource type="Curve" id="Curve_rcluj"]
+_data = [Vector2(0, 0), 0.0, 3.0, 0, 0, Vector2(0.3, 0.9), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 1, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_5n66y"]
+curve = SubResource("Curve_rcluj")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_p35eh"]
+lifetime_randomness = 0.4
+emission_shape = 1
+emission_sphere_radius = 0.3
+direction = Vector3(0, 1, 0)
+spread = 35.0
+gravity = Vector3(0, 0.3, 0)
+initial_velocity_min = 0.5
+initial_velocity_max = 2.0
+damping_min = 0.6
+damping_max = 1.3
+scale_min = 0.05
+scale_max = 0.15
+scale_curve = SubResource("CurveTexture_5n66y")
+color = Color(0.886275, 0.815686, 0.74902, 1)
+collision_mode = 1
+collision_friction = 0.4
+collision_bounce = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1dlfs"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_2h2nr"]
+material = SubResource("StandardMaterial3D_1dlfs")
+size = Vector2(0.1, 0.1)
+
+[sub_resource type="GDScript" id="GDScript_pybr5"]
+script/source = "extends GPUParticles3D
+
+func _ready():
+	# Auto-restart for one-shot effects
+	if one_shot and not emitting:
+		emitting = true
+		
+	# Auto-destroy after emission (if one-shot)
+	if one_shot:
+		# Add a timer to destroy the particles after they're done
+		var timer = Timer.new()
+		add_child(timer)
+		timer.wait_time = lifetime * 1.5
+		timer.one_shot = true
+		timer.timeout.connect(func(): queue_free())
+		timer.start()
+"
+
+[node name="DustParticles" type="GPUParticles3D"]
+emitting = false
+amount = 30
+lifetime = 1.2
+one_shot = true
+explosiveness = 0.9
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_p35eh")
+draw_pass_1 = SubResource("QuadMesh_2h2nr")
+script = ExtResource("1_dust_script")
